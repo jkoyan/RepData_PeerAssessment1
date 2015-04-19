@@ -97,4 +97,5 @@ library(lattice)
 xyplot(Mean ~ interval|weekday, data=summary, type='l', layout=(c(1,2)),
    main="Figure 4: Average Daily Activity Pattern by type of Day",
    ylab="Average Number of Steps Taken per Interval", xlab="5-minute Time Interval")  
+
 ```

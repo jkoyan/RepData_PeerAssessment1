@@ -61,7 +61,7 @@ print(tab,type="html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Sun Apr 19 14:23:50 2015 -->
+<!-- Sun Apr 19 15:31:52 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> Mean </th> <th> Median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-02 </td> <td align="right"> 0.44 </td> <td align="right"> 0.00 </td> </tr>
@@ -172,7 +172,7 @@ print(tab,type="html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Sun Apr 19 14:23:50 2015 -->
+<!-- Sun Apr 19 15:31:53 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> date </th> <th> Mean </th> <th> Median </th>  </tr>
   <tr> <td align="right"> 1 </td> <td> 2012-10-01 </td> <td align="right"> 37.38 </td> <td align="right"> 34.11 </td> </tr>
@@ -247,7 +247,7 @@ summary <- summarize(imputeddata,totalsteps = sum(imputedsteps),Mean = mean(impu
 
 library(lattice)
 xyplot(Mean ~ interval|weekday, data=summary, type='l', layout=(c(1,2)),
-   main="Figure 4: Average Daily Activity Pattern by Type of Day",
+   main="Figure 4: Average Daily Activity Pattern by type of Day",
    ylab="Average Number of Steps Taken per Interval", xlab="5-minute Time Interval")  
 ```
 

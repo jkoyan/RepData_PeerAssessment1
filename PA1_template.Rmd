@@ -1,25 +1,100 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
 output: 
   html_document:
     keep_md: true
 ---
 
+Title: "Reproducible Research: Peer Assessment 1"
+=======================================================
+```{r setoptions,echo=FALSE,results = "hide"}
+library(knitr)
+library(dplyr)
+opts_chunk$set(echo=FALSE, results = "hide")
+```
 
 ## Loading and preprocessing the data
-
+```{r loadAndPreProcessData,echo=TRUE,results='hide'}
+        filePath="C:\\_R\\4 -Reproducible Research\\Assignments\\RepData_PeerAssessment1\\activity.csv"
+        
+                
+                #check if file exists
+                if(!file.exists(filePath))
+                {
+                       print(sprintf("The file %s does not exist. Cannot proceed with data load.",filePath))         
+                }
+                #load the data
+                origdata <- tbl_df(read.csv(filePath))
+                data <- filter(origdata,!is.na(steps))
+        
+```
 
 
 ## What is mean total number of steps taken per day?
+#### Histogram of Total Steps
+```{r step1hist,echo=TRUE,results='asis'}
+activity <- group_by(data,date)
+#Calculate the Total,Mean and Median of the Steps taken per day
+summary <- summarize(activity,Total=as.numeric(sum(steps)),Mean=mean(steps),Median=median(steps))
+hist(summary$Total, breaks = 12, col = "lightblue", border = "blue",xlab="Total Steps",main="Fig 1: Histogram of Total Steps")
+```
 
+#### Table of Mean and Median
 
+```{r step1TableMean,echo=TRUE,results='asis'}
+library(xtable)
+tab <- xtable(select(summary,date,Mean,Median))
+print(tab,type="html")
+```
 
 ## What is the average daily activity pattern?
+#### Time series plot 
+```{r step2TimeSeriesPlot,echo=TRUE,results='asis'}
+activity <- group_by(data,interval)
+#Calculate the Total,Mean and Median of the Steps taken by interval averaged across all days
+summary <- summarize(activity,Total=as.numeric(sum(steps)),Mean=mean(steps),Median=median(steps))
+plot(summary$interval,summary$Mean,xlab="Interval",ylab="Average Steps",type="l",main="Fig 2: Number of Steps taken averaged across all Days.")
 
+```
 
+#### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r step2WhichIntervalHasMaxSteps, echo=TRUE, results='asis'}
+m <- filter(summary,Mean==max(summary$Mean))
+sprintf('Interval = %i contains the maximum average Steps taken across all days.',m$interval) 
+```
 
 ## Imputing missing values
+#### Calculate and Report total number of missing values.
+```{r step3ReportTotalMissingValues,echo=TRUE,results='asis'}
+sprintf("There are %i total missing values in the original activity dataset",count(filter(origdata,is.na(steps)))$n )
 
+```
 
+#### Devise a strategy for filling in all of the missing values in the dataset
+```{r step3FillMissingValues, echo=TRUE, results='asis'}
+imputeddata<- origdata %>%
+    group_by(interval)  %>%
+    mutate(imputedsteps= ifelse(is.na(steps), mean(steps, na.rm=TRUE), steps))
+imputeddata<-group_by(imputeddata,date)
+summary <- summarize(imputeddata,Total=as.numeric(sum(imputedsteps)),Mean=mean(imputedsteps),Median=median(imputedsteps))
+hist(summary$Total, breaks = 12, col = "lightblue", border = "blue",xlab="Total Steps",main="Fig 3: Histogram of Total Steps from imputed values")
+```
+
+#### Table of Mean and Median using the Imputed values
+
+```{r step3TableMeanForImputedValues,echo=TRUE,results='asis'}
+library(xtable)
+tab <- xtable(select(summary,date,Mean,Median))
+print(tab,type="html")
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r step4CreateFactorVar,echo=TRUE,results='asis'}
+imputeddata <- mutate(imputeddata,day=weekdays(as.Date(date)),weekday=ifelse(day %in% c("Monday","Tuesday","Wednesday","Thursday","Friday"),"weekday","weekend"))
+imputeddata <- group_by(imputeddata,weekday,interval)
+summary <- summarize(imputeddata,totalsteps = sum(imputedsteps),Mean = mean(imputedsteps), Median = median(imputedsteps))
+
+library(lattice)
+xyplot(Mean ~ interval|weekday, data=summary, type='l', layout=(c(1,2)),
+   main="Figure 4: Average Daily Activity Pattern by type of Day",
+   ylab="Average Number of Steps Taken per Interval", xlab="5-minute Time Interval")  
+```
